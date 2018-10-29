@@ -72,3 +72,13 @@ copied to `/usr/lib/libc++-gdb.py`.  The `pythondir` in the installed
 script should point to a directory holding the contents of the
 `python` subdirectory.  The checked-in version hardcodes the path to
 my git checkout path which is probably not what you want.
+
+## Known Caveats
+
+This has only been tested with Python 2 and not Python 3.
+
+To ease implementation, these scripts asssume a relatively modern
+version of GDB that supports gdb.printing and gdb.xmethod.  The
+top-level script should probably at least use try-blocks that catch an
+ImportError to cleanly skip autoloading if the required modules are
+not present.
