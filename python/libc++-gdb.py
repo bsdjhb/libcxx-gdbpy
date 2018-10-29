@@ -5,7 +5,7 @@
 
 import gdb.printing
 
-pythondir = '/home/john/work/git/libc++-gdbpy/python'
+pythondir = '/home/john/work/git/libcxx-gdbpy/python'
 
 if not pythondir in sys.path:
     sys.path.insert(0, pythondir)
