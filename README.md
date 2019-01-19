@@ -63,15 +63,16 @@ This table lists the xmethods implemented to date.
 
 ## Installation / Using
 
-This is a bit hacky currently.  GDB's auto-loading support looks for
-python scripts named *library*-gdb.py.  That means that the top-level
-script `libc++-gdb.py` needs to be installed in the same path as your
-existing libc++ library.  For example, if libc++ is installed as
-`/usr/lib/libc++.so.1` as on FreeBSD, then `libc++-gdb.py` needs to be
-copied to `/usr/lib/libc++-gdb.py`.  The `pythondir` in the installed
-script should point to a directory holding the contents of the
-`python` subdirectory.  The checked-in version hardcodes the path to
-my git checkout path which is probably not what you want.
+Run `make install` as root to install on a FreeBSD system.  This
+requires a GDB package version of `gdb-8.2_2` or later for fixes to
+GDB's data directory handling on FreeBSD.
+
+For other systems, install the python scripts in the `python/libcxx`
+subdirectory to a location of your choice.  Then install a copy of the
+'python/libc++-gdb.py' script to a location recognized by GDB's
+auto-loading support.  This copy of the script will also need to be
+modified to replace the string "PYTHONDIR" with the directory
+containing the other python scripts.
 
 ## Known Caveats
 
