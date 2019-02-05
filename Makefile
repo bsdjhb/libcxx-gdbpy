@@ -13,11 +13,11 @@ LIBCXX_DIR=	/usr/lib
 LIBCXX=		libc++.so.1
 
 install:
-	install -d ${DATADIR}
-	install -m 644 python/libcxx/__init__.py ${DATADIR}
-	install -m 644 python/libcxx/printers.py ${DATADIR}
-	install -m 644 python/libcxx/xmethods.py ${DATADIR}
-	install -d ${AUTO_LOAD_DIR}${LIBCXX_DIR}
+	install -d ${DESTDIR}${DATADIR}
+	install -m 644 python/libcxx/__init__.py ${DESTDIR}${DATADIR}
+	install -m 644 python/libcxx/printers.py ${DESTDIR}${DATADIR}
+	install -m 644 python/libcxx/xmethods.py ${DESTDIR}${DATADIR}
+	install -d ${DESTDIR}${AUTO_LOAD_DIR}${LIBCXX_DIR}
 	sed -e "s,PYTHONDIR,${PYTHONDIR}," python/libc++-gdb.py > \
-	    ${AUTO_LOAD_DIR}${LIBCXX_DIR}/${LIBCXX}-gdb.py
+	    ${DESTDIR}${AUTO_LOAD_DIR}${LIBCXX_DIR}/${LIBCXX}-gdb.py
 
