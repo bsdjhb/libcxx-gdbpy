@@ -2,7 +2,7 @@ LOCALBASE?=	/usr/local
 PREFIX?=	${LOCALBASE}
 
 # Where to install the helper python scripts
-PYTHONDIR=	${PREFIX}/share/libcxx-gdbpy/python
+PYTHONDIR=	${PREFIX}/share/libcxx-gdbpy
 DATADIR=	${PYTHONDIR}/libcxx
 
 # Where to install the GDB auto-load script.  LIBCXX_DIR is the

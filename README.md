@@ -67,12 +67,12 @@ Run `make install` as root to install on a FreeBSD system.  This
 requires a GDB package version of `gdb-8.2_2` or later for fixes to
 GDB's data directory handling on FreeBSD.
 
-For other systems, install the python scripts in the `python/libcxx`
+For other systems, install the python scripts in the `libcxx`
 subdirectory to a location of your choice.  Then install a copy of the
 'python/libc++-gdb.py' script to a location recognized by GDB's
 auto-loading support.  This copy of the script will also need to be
 modified to replace the string "PYTHONDIR" with the directory
-containing the other python scripts.
+containing the chosen location of the `libcxx` directory.
 
 ## Known Caveats
 
