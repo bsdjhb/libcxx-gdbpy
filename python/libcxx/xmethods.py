@@ -20,12 +20,12 @@ class StdUniquePtr_get(gdb.xmethod.XMethodWorker):
         return None
 
     def get_result_type(self, obj):
-        return self.elem_type
+        return self.elem_type.pointer()
 
     def __call__(self, obj):
         return obj['__ptr_']['__value_']
 
-class StdUniquePtr_get(gdb.xmethod.XMethodWorker):
+class StdUniquePtr_deref(gdb.xmethod.XMethodWorker):
     def __init__(self, elem_type):
         self.elem_type = elem_type
 
@@ -36,14 +36,14 @@ class StdUniquePtr_get(gdb.xmethod.XMethodWorker):
         return self.elem_type
 
     def __call__(self, obj):
-        return obj['__ptr_']['__value_']
+        return obj['__ptr_']['__value_'].dereference()
 
 class StdUniquePtrMatcher(gdb.xmethod.XMethodMatcher):
     def __init__(self):
         gdb.xmethod.XMethodMatcher.__init__(self, "unique_ptr")
         self.methods = [StdXMethod("get", StdUniquePtr_get),
                         StdXMethod("operator->", StdUniquePtr_get),
-                        StdXMethod("operator*", StdUniquePtr_get)]
+                        StdXMethod("operator*", StdUniquePtr_deref)]
 
     def match(self, class_type, method_name):
         if not re.match('^std::__1::unique_ptr<.*>', class_type.tag):
