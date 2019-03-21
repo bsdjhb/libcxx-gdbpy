@@ -46,6 +46,9 @@ This table lists the pretty printers implemented to date.
 
 | Class | Notes |
 | ----- | ----- |
+| std::list |
+| std::list::const_iterator |
+| std::list::iterator |
 | std::string |
 | std::unique_ptr<T> |
 | std::vector<T> | T = bool not supported |
@@ -56,6 +59,8 @@ This table lists the xmethods implemented to date.
 
 | Class | Method | Notes |
 | ----- | ------ | ----- |
+| std::list::const_iterator | operator* |
+| std::list::iterator | operator* |
 | std::unique_ptr<T> | get |
 | std::unique_ptr<T> | operator-> | Not tested with T[] |
 | std::unique_ptr<T> | operator* | Not tested with T[] |

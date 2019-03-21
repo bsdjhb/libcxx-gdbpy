@@ -6,6 +6,60 @@
 import gdb
 import gdb.printing
 
+class StdListPrinter:
+    """Print a std::list"""
+
+    class __iterator:
+        def __init__(self, head, node_type):
+            self.current = head['__next_']
+            self.end = head.address
+            self.node_type = node_type
+            self.count = 0
+
+        def __iter__(self):
+            return self
+
+        def next(self):
+            if self.current == self.end:
+                raise StopIteration
+            else:
+                node = self.current.cast(self.node_type)
+                item = node['__value_']
+                count = self.count
+                self.current = self.current['__next_']
+                self.count = self.count + 1
+                return ('[%d]' % count, item)
+
+    def __init__(self, val):
+        self.val = val
+        self.node_type = gdb.lookup_type(self.val.type.name + '::__node_pointer')
+
+    def size(self):
+        return self.val['__size_alloc_']['__value_']
+
+    def children(self):
+        head = self.val['__end_']
+        return self.__iterator(self.val['__end_'], self.nodetype)
+
+    def to_string(self):
+        if self.size() == 0:
+            return "empty std::list"
+        return "std::list"
+
+class StdListIteratorPrinter:
+    """Print a std::list::iterator"""
+
+    def __init__(self, val):
+        self.val = val
+        link_type = self.val['__ptr_'].type.strip_typedefs().target()
+        node_type_name = str(link_type).replace('__list_node_base', '__list_node', 1)
+        self.node_type = gdb.lookup_type(node_type_name).pointer()
+
+    def to_string(self):
+        node = self.val['__ptr_'].cast(self.node_type)
+        item = node['__value_']
+        return str(item)
+
 class StdUniquePtrPrinter:
     """Print a std::unique_ptr"""
 
@@ -76,6 +130,9 @@ class StdStringPrinter:
 
 def build_pretty_printers():
     pp = gdb.printing.RegexpCollectionPrettyPrinter("libc++")
+    pp.add_printer('list', '^std::__1::list<.*>$', StdListPrinter)
+    pp.add_printer('list::iterator', '^std::__1::__list_(const)?iterator<.*>$',
+                   StdListIteratorPrinter)
     pp.add_printer('unique_ptr', '^std::__1::unique_ptr<.*>$',
                    StdUniquePtrPrinter)
     pp.add_printer('vector', '^std::__1::vector<.*>$', StdVectorPrinter)
