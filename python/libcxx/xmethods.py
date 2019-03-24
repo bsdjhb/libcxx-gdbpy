@@ -18,6 +18,39 @@ class StdXMethod(gdb.xmethod.XMethod):
         gdb.xmethod.XMethod.__init__(self, name)
         self.worker = worker
 
+class StdForwardListIterator_deref(gdb.xmethod.XMethodWorker):
+    def __init__(self, elem_type, node_type):
+        self.elem_type = elem_type
+        self.node_type = node_type
+
+    def get_arg_types(self):
+        return None
+
+    def get_result_type(self, obj):
+        return self.elem_type
+
+    def __call__(self, obj):
+        return obj['__ptr_'].cast(self.node_type)['__value_']
+
+class StdForwardListIteratorMatcher(gdb.xmethod.XMethodMatcher):
+    def __init__(self):
+        gdb.xmethod.XMethodMatcher.__init__(self, "forward_list::iterator")
+        self.methods = [StdXMethod("operator*", StdForwardListIterator_deref)]
+
+    def match(self, class_type, method_name):
+        if not re.match('^std::__1::__forward_list_(const)?iterator<.*>', class_type.tag):
+            return None
+        ptr_field = find_field(class_type, '__ptr_')
+        if not ptr_field:
+            return None
+        link_type = ptr_field.type.strip_typedefs().target()
+        node_type = link_type.template_argument(0)
+        for method in self.methods:
+            if method.name == method_name:
+                if method.enabled:
+                    return method.worker(class_type.template_argument(0), node_type)
+        return None
+
 class StdListIterator_deref(gdb.xmethod.XMethodWorker):
     def __init__(self, elem_type, node_type):
         self.elem_type = elem_type
@@ -126,6 +159,7 @@ class StdVectorMatcher(gdb.xmethod.XMethodMatcher):
         return None
 
 def register_libcxx_xmethods(objfile):
+    gdb.xmethod.register_xmethod_matcher(objfile, StdForwardListIteratorMatcher())
     gdb.xmethod.register_xmethod_matcher(objfile, StdListIteratorMatcher())
     gdb.xmethod.register_xmethod_matcher(objfile, StdUniquePtrMatcher())
     gdb.xmethod.register_xmethod_matcher(objfile, StdVectorMatcher())

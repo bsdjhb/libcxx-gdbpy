@@ -6,6 +6,51 @@
 import gdb
 import gdb.printing
 
+class StdForwardListPrinter:
+    """Print a std::forward_list"""
+
+    class __iterator:
+        def __init__(self, head):
+            self.current = head
+            self.count = 0
+
+        def __iter__(self):
+            return self
+
+        def next(self):
+            if self.current == 0:
+                raise StopIteration
+            else:
+                item = self.current['__value_']
+                count = self.count
+                self.current = self.current['__next_']
+                self.count = self.count + 1
+                return ('[%d]' % count, item)
+
+    def __init__(self, val):
+        self.val = val
+
+    def children(self):
+        return self.__iterator(self.val['__before_begin_']['__value_']['__next_'])
+
+    def to_string(self):
+        if self.val['__before_begin_']['__value_']['__next_'] == 0:
+            return "empty std::forward_list"
+        return "std::forward_list"
+
+class StdForwardListIteratorPrinter:
+    """Print a std::forward_list::iterator"""
+
+    def __init__(self, val):
+        self.val = val
+        link_type = self.val['__ptr_'].type.strip_typedefs().target()
+        self.node_type = link_type.template_argument(0)
+
+    def to_string(self):
+        node = self.val['__ptr_'].cast(self.node_type)
+        item = node['__value_']
+        return str(item)
+
 class StdListPrinter:
     """Print a std::list"""
 
@@ -130,6 +175,9 @@ class StdStringPrinter:
 
 def build_pretty_printers():
     pp = gdb.printing.RegexpCollectionPrettyPrinter("libc++")
+    pp.add_printer('forward_list', '^std::__1::forward_list<.*>$', StdForwardListPrinter)
+    pp.add_printer('forward_list::iterator', '^std::__1::__forward_list_(const)?iterator<.*>$',
+                   StdForwardListIteratorPrinter)
     pp.add_printer('list', '^std::__1::list<.*>$', StdListPrinter)
     pp.add_printer('list::iterator', '^std::__1::__list_(const)?iterator<.*>$',
                    StdListIteratorPrinter)

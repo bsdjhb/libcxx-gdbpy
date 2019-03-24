@@ -46,6 +46,9 @@ This table lists the pretty printers implemented to date.
 
 | Class | Notes |
 | ----- | ----- |
+| std::forward_list |
+| std::forward_list::const_iterator |
+| std::forward_list::iterator |
 | std::list |
 | std::list::const_iterator |
 | std::list::iterator |
@@ -59,6 +62,8 @@ This table lists the xmethods implemented to date.
 
 | Class | Method | Notes |
 | ----- | ------ | ----- |
+| std::forward_list::const_iterator | operator* |
+| std::forward_list::iterator | operator* |
 | std::list::const_iterator | operator* |
 | std::list::iterator | operator* |
 | std::unique_ptr<T> | get |
