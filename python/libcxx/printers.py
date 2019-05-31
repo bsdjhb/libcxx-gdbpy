@@ -6,10 +6,16 @@
 import gdb
 import gdb.printing
 
+class IteratorBase:
+    """Provide python 2.x compat for iterators"""
+
+    def next(self):
+        return self.__next__()
+    
 class StdForwardListPrinter:
     """Print a std::forward_list"""
 
-    class __iterator:
+    class __iterator(IteratorBase):
         def __init__(self, head):
             self.current = head
             self.count = 0
@@ -17,7 +23,7 @@ class StdForwardListPrinter:
         def __iter__(self):
             return self
 
-        def next(self):
+        def __next__(self):
             if self.current == 0:
                 raise StopIteration
             else:
@@ -54,7 +60,7 @@ class StdForwardListIteratorPrinter:
 class StdListPrinter:
     """Print a std::list"""
 
-    class __iterator:
+    class __iterator(IteratorBase):
         def __init__(self, head, node_type):
             self.current = head['__next_']
             self.end = head.address
@@ -64,7 +70,7 @@ class StdListPrinter:
         def __iter__(self):
             return self
 
-        def next(self):
+        def __next__(self):
             if self.current == self.end:
                 raise StopIteration
             else:
@@ -118,7 +124,7 @@ class StdUniquePtrPrinter:
 class StdVectorPrinter:
     """Print a std::vector"""
 
-    class __iterator:
+    class __iterator(IteratorBase):
         def __init__(self, begin, end):
             self.current = begin
             self.end = end
@@ -127,7 +133,7 @@ class StdVectorPrinter:
         def __iter__(self):
             return self
 
-        def next(self):
+        def __next__(self):
             if self.current == self.end:
                 raise StopIteration
             else:
