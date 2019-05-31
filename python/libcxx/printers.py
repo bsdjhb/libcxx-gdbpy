@@ -90,7 +90,7 @@ class StdListPrinter:
 
     def children(self):
         head = self.val['__end_']
-        return self.__iterator(self.val['__end_'], self.nodetype)
+        return self.__iterator(self.val['__end_'], self.node_type)
 
     def to_string(self):
         if self.size() == 0:
