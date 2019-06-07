@@ -137,7 +137,7 @@ class StdVector_subscript(gdb.xmethod.XMethodWorker):
     def get_arg_types(self):
         return gdb.lookup_type('size_t')
 
-    def get_result_type(self, obj):
+    def get_result_type(self, obj, index):
         return self.elem_type
 
     def __call__(self, obj, index):
