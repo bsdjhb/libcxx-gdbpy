@@ -87,8 +87,6 @@ containing the chosen location of the `libcxx` directory.
 
 ## Known Caveats
 
-This has only been tested with Python 2 and not Python 3.
-
 To ease implementation, these scripts asssume a relatively modern
 version of GDB that supports gdb.printing and gdb.xmethod.  The
 top-level script should probably at least use try-blocks that catch an
