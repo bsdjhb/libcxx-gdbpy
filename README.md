@@ -54,6 +54,7 @@ This table lists the pretty printers implemented to date.
 | std::list::iterator |
 | std::string |
 | std::unique_ptr<T> |
+| std::unordered_map<K,V> |
 | std::vector<T> | T = bool not supported |
 
 ## Xmethods

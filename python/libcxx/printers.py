@@ -121,6 +121,50 @@ class StdUniquePtrPrinter:
         v = self.val['__ptr_']['__value_']
         return "std::unique_ptr<%s> = %s" % (v.type.target(), v)
 
+class StdUnorderedMapPrinter:
+    """Print a std::unordered_map"""
+
+    class __iterator(IteratorBase):
+        def __init__(self, begin, node_type):
+            self.current = begin
+            self.node_type = node_type
+            self.state = 0
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            if self.current == 0:
+                raise StopIteration
+            else:
+                node = self.current.cast(self.node_type)
+                if self.state == 0:
+                    name = 'key'
+                    item = node['__value_']['__cc']['first']
+                    self.state = 1
+                else:
+                    name = 'value'
+                    item = node['__value_']['__cc']['second']
+                    self.state = 0
+                    self.current = self.current['__next_']
+                return (name, item)
+
+    def __init__(self, val):
+        self.val = val
+        next_type = val['__table_']['__p1_']['__value_'].type
+        self.node_type = next_type.template_argument(0)
+
+    def children(self):
+        return self.__iterator(self.val['__table_']['__p1_']['__value_']['__next_'],
+                               self.node_type)
+
+    def display_hint(self):
+        return 'map'
+
+    def to_string(self):
+        i = self.val['__table_']['__p2_']['__value_']
+        return "std::unordered_map with %d element%s" % (i, "" if i == 1 else "s")
+
 class StdVectorPrinter:
     """Print a std::vector"""
 
@@ -189,6 +233,8 @@ def build_pretty_printers():
                    StdListIteratorPrinter)
     pp.add_printer('unique_ptr', '^std::__1::unique_ptr<.*>$',
                    StdUniquePtrPrinter)
+    pp.add_printer('unordered_map', '^std::__1::unordered_map<.*>$',
+                   StdUnorderedMapPrinter)
     pp.add_printer('vector', '^std::__1::vector<.*>$', StdVectorPrinter)
     pp.add_printer('string', '^std::__1::basic_string<.*>$', StdStringPrinter)
     return pp
