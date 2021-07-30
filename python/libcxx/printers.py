@@ -165,6 +165,22 @@ class StdUnorderedMapPrinter:
         i = self.val['__table_']['__p2_']['__value_']
         return "std::unordered_map with %d element%s" % (i, "" if i == 1 else "s")
 
+class StdUnorderedMapIteratorPrinter:
+    """Print a std::unordered_map::iterator"""
+
+    def __init__(self, val):
+        self.val = val
+        iter_type = self.val.type.template_argument(0)
+        self.node_type = iter_type.template_argument(0)
+
+    def to_string(self):
+        node = self.val['__i_']['__node_'].cast(self.node_type)
+        if node == 0:
+            return "end()"
+        key = node['__value_']['__cc']['first']
+        value = node['__value_']['__cc']['second']
+        return "[%s] = %s" % (str(key), str(value))
+
 class StdVectorPrinter:
     """Print a std::vector"""
 
@@ -235,6 +251,8 @@ def build_pretty_printers():
                    StdUniquePtrPrinter)
     pp.add_printer('unordered_map', '^std::__1::unordered_map<.*>$',
                    StdUnorderedMapPrinter)
+    pp.add_printer('unordered_map::iterator', '^std::__1::__hash_map_(const)?iterator<.*>$',
+                   StdUnorderedMapIteratorPrinter)
     pp.add_printer('vector', '^std::__1::vector<.*>$', StdVectorPrinter)
     pp.add_printer('string', '^std::__1::basic_string<.*>$', StdStringPrinter)
     return pp
