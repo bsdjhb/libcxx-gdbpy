@@ -46,6 +46,9 @@ This table lists the pretty printers implemented to date.
 
 | Class | Notes |
 | ----- | ----- |
+| std::deque |
+| std::deque::const_iterator |
+| std::deque::iterator |
 | std::forward_list |
 | std::forward_list::const_iterator |
 | std::forward_list::iterator |

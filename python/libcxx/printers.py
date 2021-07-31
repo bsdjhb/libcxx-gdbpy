@@ -11,7 +11,71 @@ class IteratorBase:
 
     def next(self):
         return self.__next__()
-    
+
+def dequeBlockSize(value_type):
+    if value_type.sizeof < 256:
+        return 4096 / value_type.sizeof
+    else:
+        return 16
+
+class StdDequePrinter:
+    """Print a std::deque"""
+
+    class __iterator(IteratorBase):
+        def __init__(self, block_size, begin, end, start, size):
+            self.block_size = block_size
+            self.begin = begin
+            self.end = end
+            self.start = start
+            self.count = size
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            if self.count == 0:
+                raise StopIteration
+            item_ptr = self.begin.dereference() + self.start
+            item = item_ptr.dereference()
+            self.start = self.start + 1
+            if self.start == self.block_size:
+                self.begin = self.begin + 1
+                self.start = 0
+            self.count = self.count - 1
+            return ("", item)
+
+    def __init__(self, val):
+        self.val = val
+
+        # __block_size is generally optimized out and not available here
+        value_type = self.val.type.template_argument(0)
+        self.block_size = dequeBlockSize(value_type)
+
+    def children(self):
+        map_val = self.val['__map_']
+        return self.__iterator(self.block_size, map_val['__begin_'],
+                               map_val['__end_'], self.val['__start_'],
+                               self.val['__size_']['__value_'])
+
+    def display_hint(self):
+        return 'array'
+
+    def to_string(self):
+        i = self.val['__size_']['__value_']
+        return "std::deque with %d element%s" % (i, "" if i == 1 else "s")
+
+class StdDequeIteratorPrinter:
+    """Print a std::deque::iterator"""
+
+    def __init__(self, val):
+        self.val = val
+        value_type = self.val.type.template_argument(0)
+        self.block_size = dequeBlockSize(value_type)
+
+    def to_string(self):
+        item = self.val['__ptr_'].dereference()
+        return str(item)
+
 class StdForwardListPrinter:
     """Print a std::forward_list"""
 
@@ -241,6 +305,9 @@ class StdStringPrinter:
 
 def build_pretty_printers():
     pp = gdb.printing.RegexpCollectionPrettyPrinter("libc++")
+    pp.add_printer('deque', '^std::__1::deque<.*>$', StdDequePrinter)
+    pp.add_printer('deque::iterator', '^std::__1::__deque_iterator<.*>$',
+                   StdDequeIteratorPrinter)
     pp.add_printer('forward_list', '^std::__1::forward_list<.*>$', StdForwardListPrinter)
     pp.add_printer('forward_list::iterator', '^std::__1::__forward_list_(const)?iterator<.*>$',
                    StdForwardListIteratorPrinter)
