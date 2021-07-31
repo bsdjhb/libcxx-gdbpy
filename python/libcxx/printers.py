@@ -309,16 +309,16 @@ def build_pretty_printers():
     pp.add_printer('deque::iterator', '^std::__1::__deque_iterator<.*>$',
                    StdDequeIteratorPrinter)
     pp.add_printer('forward_list', '^std::__1::forward_list<.*>$', StdForwardListPrinter)
-    pp.add_printer('forward_list::iterator', '^std::__1::__forward_list_(const)?iterator<.*>$',
+    pp.add_printer('forward_list::iterator', '^std::__1::__forward_list_(const_)?iterator<.*>$',
                    StdForwardListIteratorPrinter)
     pp.add_printer('list', '^std::__1::list<.*>$', StdListPrinter)
-    pp.add_printer('list::iterator', '^std::__1::__list_(const)?iterator<.*>$',
+    pp.add_printer('list::iterator', '^std::__1::__list_(const_)?iterator<.*>$',
                    StdListIteratorPrinter)
     pp.add_printer('unique_ptr', '^std::__1::unique_ptr<.*>$',
                    StdUniquePtrPrinter)
     pp.add_printer('unordered_map', '^std::__1::unordered_map<.*>$',
                    StdUnorderedMapPrinter)
-    pp.add_printer('unordered_map::iterator', '^std::__1::__hash_map_(const)?iterator<.*>$',
+    pp.add_printer('unordered_map::iterator', '^std::__1::__hash_map_(const_)?iterator<.*>$',
                    StdUnorderedMapIteratorPrinter)
     pp.add_printer('vector', '^std::__1::vector<.*>$', StdVectorPrinter)
     pp.add_printer('string', '^std::__1::basic_string<.*>$', StdStringPrinter)
