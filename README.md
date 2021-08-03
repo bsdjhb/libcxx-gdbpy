@@ -56,6 +56,7 @@ This table lists the pretty printers implemented to date.
 | std::list::const_iterator |
 | std::list::iterator |
 | std::string |
+| std::stack |
 | std::unique_ptr<T> |
 | std::unordered_map<K,V> |
 | std::unordered_map<K,V>::const_iterator |

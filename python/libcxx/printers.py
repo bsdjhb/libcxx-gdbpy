@@ -44,8 +44,9 @@ class StdDequePrinter:
             self.count = self.count - 1
             return ("", item)
 
-    def __init__(self, val):
+    def __init__(self, val, name="deque"):
         self.val = val
+        self.name = name
 
         # __block_size is generally optimized out and not available here
         value_type = self.val.type.template_argument(0)
@@ -62,7 +63,8 @@ class StdDequePrinter:
 
     def to_string(self):
         i = self.val['__size_']['__value_']
-        return "std::deque with %d element%s" % (i, "" if i == 1 else "s")
+        return "std::%s with %d element%s" % (self.name, i,
+                                              "" if i == 1 else "s")
 
 class StdDequeIteratorPrinter:
     """Print a std::deque::iterator"""
@@ -281,6 +283,21 @@ class StdVectorPrinter:
         end = self.val['__end_']
         return "std::vector of length %d" % int(end - begin)
 
+class StdStackPrinter:
+    """Print a std::stack"""
+
+    def __init__(self, val):
+        self.child = StdDequePrinter(val['c'], "stack")
+
+    def children(self):
+        return self.child.children()
+
+    def display_hint(self):
+        return self.child.display_hint()
+
+    def to_string(self):
+        return self.child.to_string()
+
 class StdStringPrinter:
     """Print a std::string"""
 
@@ -314,6 +331,7 @@ def build_pretty_printers():
     pp.add_printer('list', '^std::__1::list<.*>$', StdListPrinter)
     pp.add_printer('list::iterator', '^std::__1::__list_(const_)?iterator<.*>$',
                    StdListIteratorPrinter)
+    pp.add_printer('stack', '^std::__1::stack<.*>$', StdStackPrinter)
     pp.add_printer('unique_ptr', '^std::__1::unique_ptr<.*>$',
                    StdUniquePtrPrinter)
     pp.add_printer('unordered_map', '^std::__1::unordered_map<.*>$',
