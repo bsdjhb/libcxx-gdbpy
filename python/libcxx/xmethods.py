@@ -38,7 +38,7 @@ class StdForwardListIteratorMatcher(gdb.xmethod.XMethodMatcher):
         self.methods = [StdXMethod("operator*", StdForwardListIterator_deref)]
 
     def match(self, class_type, method_name):
-        if not re.match('^std::__1::__forward_list_(const)?iterator<.*>', class_type.tag):
+        if not re.match('^std::__1::__forward_list_(const_)?iterator<.*>', class_type.tag):
             return None
         ptr_field = find_field(class_type, '__ptr_')
         if not ptr_field:
@@ -71,7 +71,7 @@ class StdListIteratorMatcher(gdb.xmethod.XMethodMatcher):
         self.methods = [StdXMethod("operator*", StdListIterator_deref)]
 
     def match(self, class_type, method_name):
-        if not re.match('^std::__1::__list_(const)?iterator<.*>', class_type.tag):
+        if not re.match('^std::__1::__list_(const_)?iterator<.*>', class_type.tag):
             return None
         ptr_field = find_field(class_type, '__ptr_')
         if not ptr_field:
