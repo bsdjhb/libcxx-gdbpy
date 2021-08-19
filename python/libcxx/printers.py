@@ -71,8 +71,6 @@ class StdDequeIteratorPrinter:
 
     def __init__(self, val):
         self.val = val
-        value_type = self.val.type.template_argument(0)
-        self.block_size = dequeBlockSize(value_type)
 
     def to_string(self):
         item = self.val['__ptr_'].dereference()
