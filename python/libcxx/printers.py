@@ -195,9 +195,10 @@ class StdUnorderedMapPrinter:
     """Print a std::unordered_map"""
 
     class __iterator(IteratorBase):
-        def __init__(self, begin, node_type):
+        def __init__(self, begin, node_type, cc_field):
             self.current = begin
             self.node_type = node_type
+            self.cc_field = cc_field
             self.state = 0
 
         def __iter__(self):
@@ -210,11 +211,11 @@ class StdUnorderedMapPrinter:
                 node = self.current.cast(self.node_type)
                 if self.state == 0:
                     name = 'key'
-                    item = node['__value_']['__cc']['first']
+                    item = node['__value_'][self.cc_field]['first']
                     self.state = 1
                 else:
                     name = 'value'
-                    item = node['__value_']['__cc']['second']
+                    item = node['__value_'][self.cc_field]['second']
                     self.state = 0
                     self.current = self.current['__next_']
                 return (name, item)
@@ -223,10 +224,15 @@ class StdUnorderedMapPrinter:
         self.val = val
         next_type = val['__table_']['__p1_']['__value_'].type
         self.node_type = next_type.template_argument(0)
+        value_type = self.node_type.target().template_argument(0)
+        if find_field(value_type, '__cc_'):
+            self.cc_field = '__cc_'
+        else:
+            self.cc_field = '__cc'
 
     def children(self):
         return self.__iterator(self.val['__table_']['__p1_']['__value_']['__next_'],
-                               self.node_type)
+                               self.node_type, self.cc_field)
 
     def display_hint(self):
         return 'map'
@@ -242,13 +248,18 @@ class StdUnorderedMapIteratorPrinter:
         self.val = val
         iter_type = self.val.type.template_argument(0)
         self.node_type = iter_type.template_argument(0)
+        value_type = self.node_type.target().template_argument(0)
+        if find_field(value_type, '__cc_'):
+            self.cc_field = '__cc_'
+        else:
+            self.cc_field = '__cc'
 
     def to_string(self):
         node = self.val['__i_']['__node_'].cast(self.node_type)
         if node == 0:
             return "end()"
-        key = node['__value_']['__cc']['first']
-        value = node['__value_']['__cc']['second']
+        key = node['__value_'][self.cc_field]['first']
+        value = node['__value_'][self.cc_field]['second']
         return "[%s] = %s" % (str(key), str(value))
 
 class StdVectorPrinter:
