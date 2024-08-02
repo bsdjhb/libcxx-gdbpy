@@ -6,6 +6,12 @@
 import gdb
 import gdb.printing
 
+def find_field(type, name):
+    for field in type.fields():
+        if field.name == name:
+            return field
+    return None
+
 class IteratorBase:
     """Provide python 2.x compat for iterators"""
 
@@ -306,16 +312,23 @@ class StdStringPrinter:
         return 'string'
 
     def to_string(self):
+        # libcxx commit 29c8c070a1770fc510ccad3be753f6f50336f8cc changed how
+        # short vs long strings are encoded.
+        has_short_mask = find_field(self.val.type, '__short_mask') != None
         r_first = self.val['__r_']['__value_']
-        is_long = (r_first['__s']['__size_'] & self.val['__short_mask']) != 0
+        if has_short_mask:
+            is_long = (r_first['__s']['__size_'] & self.val['__short_mask']) != 0
+        else:
+            is_long = r_first['__s']['__is_long_'] != 0
         if is_long:
             pointer = r_first['__l']['__data_']
             size = r_first['__l']['__size_']
         else:
             pointer = r_first['__s']['__data_']
             size = r_first['__s']['__size_']
-            if int(self.val['__short_mask']) == 1:
-                size = size >> 1;
+            if has_short_mask:
+                if int(self.val['__short_mask']) == 1:
+                    size = size >> 1
         return pointer.string(length = size)
 
 def build_pretty_printers():
